@@ -2,24 +2,78 @@ import os
 import subprocess
 
 # Refer to opts.py for details about the flags
-# graph/dataset flags
+#region graph/dataset flags 
+# 9/13/23 3:57 P
+# model_type = "inv-ff-hist"
+model_type = "ff"
 
-model_type = "inv-ff-hist"
+# #9/15/2023 2:02 A
+# #region adwords triangular
+# problem = "adwords"
+# graph_family = "triangular"
+# weight_distribution = "triangular"
+# weight_distribution_param = "0.1 0.4"  # seperate by a space
+# graph_family_parameters = "10"
+# capacity_params='0 1' # add this to the flags for adwords only.
+# #endregion 
 
-problem = "adwords"
-graph_family = "triangular"
-weight_distribution = "triangular"
-weight_distribution_param = "0.1 0.4"  # seperate by a space
-graph_family_parameters = "-1"
+# # 9/18/2023 10:41 A
+# #region adwords thick-z
+# problem = "adwords"
+# graph_family = "thick-z"
+# weight_distribution = "thick-z"
+# weight_distribution_param = "0.1 0.4"  # seperate by a space
+# graph_family_parameters = "10"
+# capacity_params='0 1' # add this to the flags for adwords only.
+# #endregion 
+
+# 9/18/2023 10:41 A
+#region e-obm er
+problem = "e-obm"
+graph_family = "er"
+weight_distribution = "uniform"
+weight_distribution_param = "0 1"
+graph_family_parameters = "0.05"
+#endregion 
+
+# # 9/15/2023 9:02 A
+# #region e-obm ba
+# problem = "e-obm"
+# graph_family = "ba"
+# weight_distribution = "uniform"
+# weight_distribution_param = "0 1"
+# graph_family_parameters = "5"
+# #endregion 
+
+# # 9/19/2023 1:14 P
+# #region e-sbm gmission
+# problem = "e-obm"
+# graph_family = "gmission"
+# weight_distribution = "gmission"
+# weight_distribution_param = "3 10"
+# graph_family_parameters = "50"
+# #endregion 
+
+# # 9/19/2023 3:42 P
+# #region osbm
+# problem = "osbm"
+# graph_family = "movielense"
+# weight_distribution = "movielense"
+# weight_distribution_param = "1 2"
+# graph_family_parameters = "50"
+# #endregion 
 
 u_size = 10
-v_size = 100
-dataset_size = 1
-val_size = 1
-eval_size = 2000
+v_size = 30
+# 9/14/2023 12:57 P
+# dataset_size = 1000
+# val_size = 100
+# eval_size = 100
+# # 9/22/2023 8:34 A
+dataset_size = 2000
+val_size = 200
+eval_size = 100
 
-# add this to the flags for adwords only.
-# capacity_params='0 1'
 
 extention = "/{}_{}_{}_{}_{}by{}".format(
     problem,
@@ -37,14 +91,22 @@ val_dataset = "dataset/val" + extention
 eval_dataset = "dataset/eval" + extention
 
 save_eval_data = True
-# model flags
+#endregion
 
-batch_size = 100
+#region model flags
+
+# batch_size = 20
+# 9/14/2023 12:57 P
+# batch_size = 100
+# # 9/22/2023 8:34 A
+batch_size = 200
 eval_batch_size = 100
 
 embedding_dim = 30  # 60
 n_heads = 1  # 3
-n_epochs = 20
+# # 9/22/2023 8:34 A
+# n_epochs = 20
+n_epochs = 300
 checkpoint_epochs = 0
 eval_baselines = "greedy"
 if problem == "e-obm":
@@ -58,12 +120,16 @@ ent_rate = 0.0006
 n_encode_layers = 1
 
 baseline = "exponential"
-# directory io flags
+#endregion
+#region directory io flags
+# 9/20/2023 1:00 A
 output_dir = "saved_models"
+# output_dir = "outputs"
 log_dir = "logs_dataset"
-
-# model evaluation flags
+#endregion
+#region model evaluation flags
 eval_models = "ff ff-hist inv-ff inv-ff-hist"
+# eval_models = "greedy-rt greedy-t"
 
 eval_output = "figures"
 # this is a single checkpoint. Example: outputs_dataset/e-obm_20/run_20201226T171156/epoch-4.pt
@@ -90,7 +156,9 @@ def get_latest_model(
     if graph_family == "gmission-perm":
         graph_family = "gmission"
     for g_fam_param in g_fams.split(" "):
-        dir = f"outputs/output_{problem}_{graph_family}_{u_size}by{v_size}_p={g_fam_param}_{graph_family}_m={m}_v={v}_a=3"
+        # 9/20/2023 1:00 A
+        # dir = f"saved_models/output_{problem}_{graph_family}_{u_size}by{v_size}_p={g_fam_param}_{graph_family}_m={m}_v={v}_a=3"
+        dir = f"saved_models/{problem}_{graph_family}_{u_size}by{v_size}_p={g_fam_param}"
         list_of_files = sorted(
             os.listdir(dir + f"/{m_type}"), key=lambda s: int(s[4:12] + s[13:])
         )
@@ -114,26 +182,26 @@ arg = [
 ]
 
 
-attention_models = get_latest_model("attention", *arg)
+# attention_models = get_latest_model("attention", *arg)
 
-ff_supervised_models = get_latest_model("ff-supervised", *arg)
+# ff_supervised_models = get_latest_model("ff-supervised", *arg)
 
-gnn_hist_models = get_latest_model("gnn-hist", *arg)
+# gnn_hist_models = get_latest_model("gnn-hist", *arg)
 
-gnn_models = get_latest_model("gnn", *arg)
+# gnn_models = get_latest_model("gnn", *arg)
 
-gnn_simp_hist_models = get_latest_model("gnn-simp-hist", *arg)
+# gnn_simp_hist_models = get_latest_model("gnn-simp-hist", *arg)
 
-inv_ff_models = get_latest_model("inv-ff", *arg)
+# inv_ff_models = get_latest_model("inv-ff", *arg)
 
-inv_ff_hist_models = get_latest_model("inv-ff-hist", *arg)
+# inv_ff_hist_models = get_latest_model("inv-ff-hist", *arg)
 
-ff_models = get_latest_model("ff", *arg)
+# ff_models = get_latest_model("ff", *arg)
 
-ff_hist_models = get_latest_model("ff-hist", *arg)
+# ff_hist_models = get_latest_model("ff-hist", *arg)
 
 eval_set = graph_family_parameters
-
+# endregion
 
 def make_dir():
     if not os.path.exists(output_dir):
@@ -339,8 +407,8 @@ def evaluate_model():
 
 if __name__ == "__main__":
     # make the directories if they do not exist
-    make_dir()
+    # make_dir()
     # generate_data()
-    # train_model()
+    train_model()
     # tune_model()
-    evaluate_model()
+    # evaluate_model()

@@ -47,6 +47,7 @@ def run(opts):
 
     # Pretty print the run args
     pp.pprint(vars(opts))
+    pp.pprint(torch.cuda.device_count())
 
     # Set the random seed
     torch.manual_seed(opts.seed)

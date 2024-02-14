@@ -243,7 +243,7 @@ def get_options(args=None):
     parser.add_argument(
         "--weight_distribution_param",
         nargs="+",
-        default=[5, 100],
+        default="5 100",
         help="parameters of weight distribtion ",
     )
 
@@ -461,8 +461,11 @@ def get_options(args=None):
 
     opts = parser.parse_args(args)
     opts.use_cuda = torch.cuda.is_available() and not opts.no_cuda
-    opts.run_name = "{}_{}".format(opts.run_name, time.strftime("%Y%m%dT%H%M%S"))
-    opts.save_dir = os.path.join(opts.output_dir, opts.model, opts.run_name)
+    # 9/20/2023 2:48 A
+    # opts.run_name = "{}_{}".format(opts.run_name, time.strftime("%Y%m%dT%H%M%S"))
+    opts.run_name = "{}_{}_{}_{}{}_{}by{}".format(opts.problem, opts.graph_family, opts.weight_distribution, opts.weight_distribution_param[0] , opts.weight_distribution_param[1], opts.u_size, opts.v_size).replace(" ", "")
+    # opts.save_dir = os.path.join(opts.output_dir, opts.model, opts.run_name)
+    opts.save_dir = os.path.join(opts.output_dir, opts.run_name, "parameter_{}".format(opts.graph_family_parameter))
     if opts.bl_warmup_epochs is None:
         opts.bl_warmup_epochs = 1 if opts.baseline == "rollout" else 0
     assert (opts.bl_warmup_epochs == 0) or (opts.baseline == "rollout")
